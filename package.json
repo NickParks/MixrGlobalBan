@@ -1,0 +1,22 @@
+{
+  "name": "mixrglobalbans",
+  "version": "0.0.2",
+  "description": "A testing global ban system for Mixer",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node -r dotenv/config dist/index.js"
+  },
+  "keywords": [],
+  "author": "Nick Parks <nickparksdev@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@mixer/shortcode-oauth": "^1.1.0",
+    "@types/mysql": "^2.15.6",
+    "@types/request": "^2.48.1",
+    "@types/ws": "^6.0.1",
+    "dotenv": "^8.0.0",
+    "mysql": "^2.17.1",
+    "request": "^2.88.0",
+    "ws": "^7.0.0"
+  }
+}
