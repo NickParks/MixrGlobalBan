@@ -3,6 +3,8 @@ import WebSocket from 'ws';
 import { UserUpdate, User } from "../types/UserEvents";
 import { BanHandler } from "./banHandler";
 
+import { logger } from "../util/logger";
+
 export default class ChatClient {
     public channelIds: Array<number>;
     private chatSockets: Array<WebSocket>;
@@ -68,7 +70,7 @@ export default class ChatClient {
                     let chatClient = new WebSocket(data.endpoints[0]);
 
                     chatClient.on('open', () => {
-                        console.log(`[ChatClient] Chat Socket opened on ${channelId}`);
+                        logger.info(`Chat Socket opened on ${channelId}`);
                         this.chatSockets.push(chatClient);
                         return resolve(true);
                     });
@@ -76,7 +78,7 @@ export default class ChatClient {
                     chatClient.on('error', (error: Error) => {
                         this.channelIds.splice(this.channelIds.indexOf(channelId), 1);
                         this.chatSockets.splice(this.chatSockets.indexOf(chatClient), 1);
-                        console.error(`[ChatClient] ${error.message}`);
+                        logger.error(error);
                     });
 
                     chatClient.on('message', (rawData: any) => {
@@ -106,13 +108,13 @@ export default class ChatClient {
                                 if (updateEvent.roles.indexOf("Banned") != -1) {
                                     let channelBans = this.bans.get(channelId);
 
-                                    console.log(`[ChatClient] ${updateEvent.user.id} has been banned in ${channelId}`);
+                                    logger.info(`${updateEvent.user.id} has been banned in ${channelId}`)
 
                                     if (channelBans == null) {
                                         this.bans.set(channelId, [updateEvent.user.id]);
                                     } else {
                                         if (channelBans.indexOf(updateEvent.user.id) != -1) {
-                                            console.log(`[ChatClient] User ${updateEvent.user.id} already banned in ${channelId}`);
+                                            logger.info(`User ${updateEvent.user.id} already banned in ${channelId}`)
                                         } else {
                                             channelBans.push(updateEvent.user.id);
                                         }
