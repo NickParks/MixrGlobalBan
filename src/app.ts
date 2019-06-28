@@ -35,7 +35,9 @@ export default class ChatTracker {
             if (err.error == true) {
                 logger.error(err);
             } else {
-                logger.error(err);
+                // This isn't an actual error being thrown, instead it's a reject from the promise
+                // If the channel is already being monitored. Should be changed later
+                logger.info(err);
             }
         });
     }
