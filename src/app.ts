@@ -3,6 +3,8 @@ import ChatClient from "./client/chatClient";
 import * as request from 'request';
 import { OAuthHandler } from "./auth/oauthHandler";
 
+import { logger } from "./util/logger";
+
 export default class ChatTracker {
     public ChatClient: ChatClient;
 
@@ -15,7 +17,7 @@ export default class ChatTracker {
     }
 
     async start() {
-        console.log(`[App] Starting chat tracking service`);
+        logger.info("Starting chat tracking");
 
         let tokens = await this.OAuthHandler.attempt();
 
@@ -31,26 +33,27 @@ export default class ChatTracker {
     addChannelToClient(channelId: number) {
         this.ChatClient.connectToChannel(channelId).then((result) => { }).catch((err) => {
             if (err.error == true) {
-                console.error(err.reason);
+                logger.error(err);
             } else {
-                console.error(`[App] Error: `, err.reason);
+                logger.error(err);
             }
         });
     }
 
-    grabNewChannels(page = 0) {
-        console.log(`[App] Grabbing partners on page ${page}`);
+    grabNewChannels(page = 0, requestFail?: boolean) {
+        logger.info(`Grabbing partners on page ${page}`);
         let options = {
             url: `https://mixer.com/api/v1/channels?where=partnered:eq:true&limit=100&fields=id,token&page=${page}`,
             headers: {
-                'User-Agent': 'GlobalBanBot v0.1',
+                'User-Agent': `MixBans v${process.env.VERSION}`,
                 'Authorization': 'Bearer ' + this.OAuthHandler.accessToken
             }
         }
 
         request.get(options, (error, response, request) => {
             if (error) {
-                console.error(`[App] Request hit an error`, error);
+                logger.error(error);
+                this.grabNewChannels(page, true); //Recursive the same call but with the failed argument passed
                 return;
             }
 
@@ -62,7 +65,9 @@ export default class ChatTracker {
                 });
 
                 if (channels.length == 100) {
-                    this.grabNewChannels(page + 1);
+                    if (!requestFail) {
+                        this.grabNewChannels(page + 1);
+                    }
                 }
             }
         })
