@@ -13,5 +13,6 @@ This project aims to counter mass spam and known bad accounts across Mixer. Esse
 # Setting up enviroment
 Create a `.env` file in the root directly with the following structure:
 ```
+VERSION=
 CLIENT_ID=
 ```
